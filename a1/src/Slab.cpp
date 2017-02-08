@@ -7,11 +7,11 @@ Slab::contains(Vector3 const & p) const
   // TODO
 	// Find the distace from the central plane, if d < dist/2 then do next
 	// Project the point on the central plane and check condition given on slab
-	Real d = distace(p);
-	if(2*d<thickness){
-		//
-	}
-	else
+	// Real d = distace(p);
+	// if(2*d<thickness){
+	// 	//
+	// }
+	// else
 		return false;
 }
 
