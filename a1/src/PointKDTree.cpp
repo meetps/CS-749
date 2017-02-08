@@ -35,6 +35,13 @@ PointKDTree::build(std::vector<Point> const & points)
 }
 
 
+PointKDTree::Node *PointKDTree::node(std::vector<Point *> const & points)
+{
+  PointKDTree* temp = new PointKDTree(points);
+  return temp->root;
+}
+
+
 void fillLoAndHi(std::vector<Point*> &loPoints, 
 	std::vector<Point*> &hiPoints, std::vector<Point*> &points, 
 	float midValue, int index){
@@ -102,7 +109,7 @@ PointKDTree::build(std::vector<Point *> const & points)
 			fillLoAndHi(loPoints, hiPoints, points, (high[2] + low[2])/2.0, 2);
 		}
 		
-    root->lo = new PointKDTree(loPoints)->root;
-		root->hi = new PointKDTree(hiPoints);
+    root->lo = node(loPoints);
+		root->hi = node(hiPoints);
 	}
 }
