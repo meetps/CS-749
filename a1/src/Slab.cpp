@@ -2,24 +2,57 @@
 #include "DGP/Math.hpp"
 
 bool
-Slab::contains(Vector3 const & p) const
-{
-  // TODO
-	// Find the distace from the central plane, if d < dist/2 then do next
-	// Project the point on the central plane and check condition given on slab
-	// Real d = distace(p);
-	// if(2*d<thickness){
-	// 	//
-	// }
-	// else
-		return false;
+Slab::contains(Vector3 const & p) const{
+	// The equation of plane is a * x + b * y + c * z + d = 0
+	// the equation of other 2 planes at a distance l is
+	// a * x + b * y + c * z + d (+/-) k = 0
+	// k = sqrt(a^2 + b^2 + c^2)*l/2
+	// DONE
+	float a, b, c, d;
+	plane.getEquation(a, b, c, d);
+
+	float k = std::sqrt(a*a + b*c + c*c) * getThickness()/2;
+	
+	Plane3 plane1, plane2;
+	plane1.fromEquation(a,b,c,d+k);
+	plane2.fromEquation(a,b,c,d-k);
+	
+	if(plane1.positiveHalfSpaceContains(p) && plane2.negativeHalfSpaceContains(p) )
+		return true;
+
+	if(plane1.negativeHalfSpaceContains(p) && plane2.positiveHalfSpaceContains(p) )
+		return true;		
+
+	return false;
 }
 
 bool
-Slab::intersects(AxisAlignedBox3 const & box) const
-{
-  // TODO
-  return false;
+Slab::intersects(AxisAlignedBox3 const & box) const{
+  // DONE
+  	float a, b, c, d;
+	plane.getEquation(a, b, c, d);
+
+	float k = std::sqrt(a*a + b*c + c*c) * getThickness()/2;
+	
+	Plane3 plane1, plane2;
+	plane1.fromEquation(a,b,c,d+k);
+	plane2.fromEquation(a,b,c,d-k);
+	//This variables would be true if all the points 
+	// of the box are on the same side of slab
+	bool check1=true, check2=true;
+
+	for(long i=0; i<8;i++){
+		Vector3 p = box.getCorner(i);
+
+		if( (!plane1.positiveHalfSpaceContains(p)) && (!plane2.positiveHalfSpaceContains(p)) )
+			check1 = check1&true;
+		if( (!plane1.negativeHalfSpaceContains(p)) && (!plane2.negativeHalfSpaceContains(p)) )
+			check2 = check2&true;			
+	}
+	if(check1 || check2)
+		return false;
+
+  return true;
 }
 
 void

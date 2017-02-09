@@ -80,6 +80,41 @@ class PointKDTree : private Noncopyable
       //   - If node->hi && node->hi->bbox intersects range, rangeQuery(node->hi, range, points_in_range)
     }
 
+
+    void rangeQueryHelper(PointKDTree::Node* root, AxisAlignedBox3 const & query, std::vector<Point *> &points_in_range)
+    { 
+
+      if(root==NULL) return;
+
+      if(query.intersects(root->bbox))
+      {
+        if(root->lo)
+        {
+          rangeQueryHelper(root->lo, query, points_in_range);
+        }
+        
+        if(root->hi)
+        {
+          rangeQueryHelper(root->hi, query, points_in_range);
+        }
+
+        for(int i=0; i<(root->points).size(); i++)
+        {
+          Point* thisPointPointer = (root->points)[i]; 
+          if(query.intersects(thisPointPointer->getPosition()))
+          {
+            points_in_range.push_back(thisPointPointer);
+          }
+        }
+      }
+    }
+
+    void rangeQuery(AxisAlignedBox3 const & query, std::vector<Point *> & points_in_range) const
+    {
+      points_in_range.clear();
+
+	    rangeQueryHelper(root, query, points_in_range);
+    }
 }; // class PointKDTree
 
 #endif
