@@ -82,7 +82,7 @@ class PointKDTree : private Noncopyable
     }
 
 
-    void rangeQueryHelper(PointKDTree::Node* root, AxisAlignedBox3 const & query, std::vector<Point *> &points_in_range)
+    void rangeQueryHelper(PointKDTree::Node* root, RangeT const & query, std::vector<Point *> &points_in_range) const
     { 
 
       if(root==NULL) return;
@@ -109,6 +109,7 @@ class PointKDTree : private Noncopyable
         }
       }
     }
+  
 }; // class PointKDTree
 
 #endif
