@@ -1,4 +1,5 @@
 #include "PointCloud.hpp"
+#include "PointKDTree.hpp"
 #include "DGP/Graphics/Shader.hpp"
 #include <fstream>
 #include <sstream>
@@ -173,6 +174,7 @@ PointCloud::ransac(long num_iters, Real slab_thickness, long min_points, Slab & 
 {
   // TODO
 
+  // PointKDTree tree(slab_points);
   //   - Construct a kd-tree on the enabled points (remember to build the kd-tree with pointers to existing points -- you
   //     shouldn't be copying the points themselves, either explicitly or implicitly).
   //   - Generate num_iters random triplets of enabled points and fit a plane to them.

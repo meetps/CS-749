@@ -72,6 +72,7 @@ class PointKDTree : private Noncopyable
       // TODO
 
       points_in_range.clear();
+      rangeQueryHelper(root, range, points_in_range);
 
       // Write a private recursive helper function rangeQuery(node, range, points_in_range):
       //   - If node->bbox does not intersect range, return
@@ -107,13 +108,6 @@ class PointKDTree : private Noncopyable
           }
         }
       }
-    }
-
-    void rangeQuery(AxisAlignedBox3 const & query, std::vector<Point *> & points_in_range) const
-    {
-      points_in_range.clear();
-
-	    rangeQueryHelper(root, query, points_in_range);
     }
 }; // class PointKDTree
 
