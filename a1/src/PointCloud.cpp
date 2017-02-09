@@ -179,6 +179,8 @@ PointCloud::ransac(long num_iters, Real slab_thickness, long min_points, Slab & 
   //     shouldn't be copying the points themselves, either explicitly or implicitly).
       const PointKDTree kdt(slab_points);
 
+
+      long max = 0;
   //   - Generate num_iters random triplets of enabled points and fit a plane to them.
       for(long i =0; i<num_iters; i++){
           //Generate 3 points && fit a plane through them
@@ -189,20 +191,28 @@ PointCloud::ransac(long num_iters, Real slab_thickness, long min_points, Slab & 
 
           Plane3 plane;
           plane.fromThreePoints(slab_points[rnd1]->getPosition(), slab_points[rnd2]->getPosition(), slab_points[rnd3]->getPosition());
-          
+
+
+  //   - Using the kd-tree, see how many other enabled points are contained in the slab supported by this plane with thickness
+  //     slab_thickness (extends to distance 0.5 * slab_thickness on each side of the plane).
+
           Slab slab(plane, slab_thickness);
           std::vector<Point *> tempPoints;
           kdt.rangeQuery(slab, tempPoints);
           long l = tempPoints.size();
 
-        }
-
-  //   - Using the kd-tree, see how many other enabled points are contained in the slab supported by this plane with thickness
-  //     slab_thickness (extends to distance 0.5 * slab_thickness on each side of the plane).
-
-
   //   - If this number is >= min_points and > the previous maximum, the plane is the current best fit. Set the 'slab' argument
   //     to be the slab for this plane, and update slab_points to be the set of (enabled) matching points for this plane.
+
+        //   if (l > min_points && l > max)
+        //   {
+        //     max = l;
+        //     slab.setPlane(plane);
+        //   }
+        }
+
+
+
   //   - At the end, for visualization purposes, update the corners of the best slab using its set of matching points, and
   //     return the number of (enabled) matching points.
 

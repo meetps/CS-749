@@ -81,7 +81,7 @@ class PointKDTree : private Noncopyable
       //   - If node->hi && node->hi->bbox intersects range, rangeQuery(node->hi, range, points_in_range)
     }
 
-
+    template <typename RangeT>
     void rangeQueryHelper(PointKDTree::Node* root, RangeT const & query, std::vector<Point *> &points_in_range) const
     { 
 
