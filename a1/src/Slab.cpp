@@ -30,30 +30,32 @@ Slab::contains(Vector3 const & p) const{
 bool
 Slab::intersects(AxisAlignedBox3 const & box) const{
   // DONE
-  	float a, b, c, d;
+  float a, b, c, d;
 	plane.getEquation(a, b, c, d);
 
 	float k = std::sqrt(a*a + b*c + c*c) * getThickness()/2;
-	
+  // std::cout<<a<<b<<c<<d<<k<<"\n";
 	Plane3 plane1, plane2;
-	plane1.fromEquation(a,b,c,d+k);
-	plane2.fromEquation(a,b,c,d-k);
+	plane1 = plane1.fromEquation(a,b,c,d+k);
+	plane2 = plane2.fromEquation(a,b,c,d-k);
 	//This variables would be true if all the points 
 	// of the box are on the same side of slab
-	bool check1=true, check2=true;
-
+	// bool check1=true, check2=true;
+  std::vector<bool> left(8,0);
+  std::vector<bool> right(8,0);
 	for(long i=0; i<8;i++){
 		Vector3 p = box.getCorner(i);
+    if( (!plane1.positiveHalfSpaceContains(p)) && (!plane2.positiveHalfSpaceContains(p)) )
+      left[i] = 1;
+    if( (!plane1.negativeHalfSpaceContains(p)) && (!plane2.negativeHalfSpaceContains(p)) )
+      right[i] = 1;  
+  }
 
-		if( (!plane1.positiveHalfSpaceContains(p)) && (!plane2.positiveHalfSpaceContains(p)) )
-			check1 = check1&true;
-		if( (!plane1.negativeHalfSpaceContains(p)) && (!plane2.negativeHalfSpaceContains(p)) )
-			check2 = check2&true;			
-	}
-	if(check1 || check2)
-		return false;
+  int lsum = std::accumulate(std::begin(left),std::end(left),0);
+  int rsum = std::accumulate(std::begin(right),std::end(right),0);
 
-  return true;
+  return !((lsum==8) || (rsum==8));
+
 }
 
 void

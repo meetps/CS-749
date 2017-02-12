@@ -215,9 +215,10 @@ PointCloud::ransac(long num_iters, Real slab_thickness, long min_points, Slab & 
           {
             max = l;
             slab = tempslab;
+            slab.updateCorners(tempPoints);
           }
         }
-
+       
   //   - At the end, for visualization purposes, update the corners of the best slab using its set of matching points, and
   //     return the number of (enabled) matching points.
 
