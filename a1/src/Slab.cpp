@@ -30,14 +30,14 @@ Slab::contains(Vector3 const & p) const{
 bool
 Slab::intersects(AxisAlignedBox3 const & box) const{
   // DONE
-  	float a, b, c, d;
+  float a, b, c, d;
 	plane.getEquation(a, b, c, d);
 
 	float k = std::sqrt(a*a + b*c + c*c) * getThickness()/2;
 	
 	Plane3 plane1, plane2;
-	plane1.fromEquation(a,b,c,d+k);
-	plane2.fromEquation(a,b,c,d-k);
+	plane1 = plane1.fromEquation(a,b,c,d+k);
+	plane2 = plane2.fromEquation(a,b,c,d-k);
 	//This variables would be true if all the points 
 	// of the box are on the same side of slab
 	bool check1=true, check2=true;
