@@ -194,6 +194,8 @@ PointCloud::ransac(long num_iters, Real slab_thickness, long min_points, Slab & 
           
           long len = pp.size();
 
+          if(len == 0) return 0;
+
           int rnd1 = std::rand()%len;
           int rnd2 = std::rand()%len;
           int rnd3 = std::rand()%len;
@@ -221,6 +223,7 @@ PointCloud::ransac(long num_iters, Real slab_thickness, long min_points, Slab & 
             max = l;
             slab = tempslab;
             slab.updateCorners(tempPoints);
+            slab_points = tempPoints;
           }
         }
        
