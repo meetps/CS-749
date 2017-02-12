@@ -177,8 +177,11 @@ PointCloud::ransac(long num_iters, Real slab_thickness, long min_points, Slab & 
   // PointKDTree tree(slab_points);
   //   - Construct a kd-tree on the enabled points (remember to build the kd-tree with pointers to existing points -- you
   //     shouldn't be copying the points themselves, either explicitly or implicitly).
-      const PointKDTree kdt(slab_points);
-
+      std::vector<Point *> pp(points.size());
+      for (size_t i = 0; i < pp.size(); ++i)
+      pp[i] = const_cast<Point *>(&points[i]);  // removing the const is not the greatest thing to do, be careful...
+      
+      PointKDTree kdt(pp);
 
       long max = 0;
   //   - Generate num_iters random triplets of enabled points and fit a plane to them.
@@ -188,7 +191,7 @@ PointCloud::ransac(long num_iters, Real slab_thickness, long min_points, Slab & 
           int rnd1 = std::rand()%len;
           int rnd2 = std::rand()%len;
           int rnd3 = std::rand()%len;
-
+          
           Plane3 plane;
           plane.fromThreePoints(slab_points[rnd1]->getPosition(), slab_points[rnd2]->getPosition(), slab_points[rnd3]->getPosition());
 
@@ -196,27 +199,26 @@ PointCloud::ransac(long num_iters, Real slab_thickness, long min_points, Slab & 
   //   - Using the kd-tree, see how many other enabled points are contained in the slab supported by this plane with thickness
   //     slab_thickness (extends to distance 0.5 * slab_thickness on each side of the plane).
 
-          Slab slab(plane, slab_thickness);
+          Slab tempslab(plane, slab_thickness);
           std::vector<Point *> tempPoints;
-          kdt.rangeQuery(slab, tempPoints);
+          kdt.rangeQuery(tempslab, tempPoints);
+          
           long l = tempPoints.size();
 
   //   - If this number is >= min_points and > the previous maximum, the plane is the current best fit. Set the 'slab' argument
   //     to be the slab for this plane, and update slab_points to be the set of (enabled) matching points for this plane.
 
-        //   if (l > min_points && l > max)
-        //   {
-        //     max = l;
-        //     slab.setPlane(plane);
-        //   }
+          if (l > min_points && l > max)
+          {
+            max = l;
+            slab = tempslab;
+          }
         }
-
-
 
   //   - At the end, for visualization purposes, update the corners of the best slab using its set of matching points, and
   //     return the number of (enabled) matching points.
 
-  return 0;
+  return max;
 }
 
 long

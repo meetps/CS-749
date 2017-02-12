@@ -30,7 +30,6 @@ PointKDTree::build(std::vector<Point> const & points)
   std::vector<Point *> pp(points.size());
   for (size_t i = 0; i < pp.size(); ++i)
     pp[i] = const_cast<Point *>(&points[i]);  // removing the const is not the greatest thing to do, be careful...
-
   build(pp);
 }
 
@@ -71,7 +70,9 @@ PointKDTree::build(std::vector<Point *> const & points)
   //   to points.
 	
   // this->
-  root->points = points; 
+  Node * ptr_root = new Node();
+  ptr_root->points = points;
+  root = ptr_root; 
 
   for(int i=0; i<points.size(); i++)
   {
