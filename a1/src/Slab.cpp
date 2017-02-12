@@ -9,13 +9,14 @@ Slab::contains(Vector3 const & p) const{
 	// k = sqrt(a^2 + b^2 + c^2)*l/2
 	// DONE
 	float a, b, c, d;
-	plane.getEquation(a, b, c, d);
+	
+  plane.getEquation(a, b, c, d);
 
 	float k = std::sqrt(a*a + b*c + c*c) * getThickness()/2;
 	
 	Plane3 plane1, plane2;
-	plane1.fromEquation(a,b,c,d+k);
-	plane2.fromEquation(a,b,c,d-k);
+	plane1 = plane1.fromEquation(a,b,c,d+k);
+	plane2 = plane2.fromEquation(a,b,c,d-k);
 	
 	if(plane1.positiveHalfSpaceContains(p) && plane2.negativeHalfSpaceContains(p) )
 		return true;

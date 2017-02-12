@@ -174,7 +174,6 @@ PointCloud::ransac(long num_iters, Real slab_thickness, long min_points, Slab & 
 {
   // TODO
 
-  // PointKDTree tree(slab_points);
   //   - Construct a kd-tree on the enabled points (remember to build the kd-tree with pointers to existing points -- you
   //     shouldn't be copying the points themselves, either explicitly or implicitly).
       std::vector<Point *> pp(points.size());
@@ -195,9 +194,9 @@ PointCloud::ransac(long num_iters, Real slab_thickness, long min_points, Slab & 
           int rnd3 = std::rand()%len;
 
           Plane3 plane;
-          plane.fromThreePoints(points[rnd1].getPosition(), 
-                                points[rnd2].getPosition(), 
-                                points[rnd3].getPosition());
+          plane = plane.fromThreePoints(points[rnd1].getPosition(), 
+                                        points[rnd2].getPosition(), 
+                                        points[rnd3].getPosition());
 
   //   - Using the kd-tree, see how many other enabled points are contained in the slab supported by this plane with thickness
   //     slab_thickness (extends to distance 0.5 * slab_thickness on each side of the plane).
