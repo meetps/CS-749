@@ -187,20 +187,24 @@ PointCloud::ransac(long num_iters, Real slab_thickness, long min_points, Slab & 
   //   - Generate num_iters random triplets of enabled points and fit a plane to them.
       for(long i =0; i<num_iters; i++){
           //Generate 3 points && fit a plane through them
-          long len = slab_points.size();
+          
+          long len = points.size();
+
           int rnd1 = std::rand()%len;
           int rnd2 = std::rand()%len;
           int rnd3 = std::rand()%len;
-          
-          Plane3 plane;
-          plane.fromThreePoints(slab_points[rnd1]->getPosition(), slab_points[rnd2]->getPosition(), slab_points[rnd3]->getPosition());
 
+          Plane3 plane;
+          plane.fromThreePoints(points[rnd1].getPosition(), 
+                                points[rnd2].getPosition(), 
+                                points[rnd3].getPosition());
 
   //   - Using the kd-tree, see how many other enabled points are contained in the slab supported by this plane with thickness
   //     slab_thickness (extends to distance 0.5 * slab_thickness on each side of the plane).
 
           Slab tempslab(plane, slab_thickness);
           std::vector<Point *> tempPoints;
+
           kdt.rangeQuery(tempslab, tempPoints);
           
           long l = tempPoints.size();
