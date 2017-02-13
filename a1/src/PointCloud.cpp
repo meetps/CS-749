@@ -3,6 +3,7 @@
 #include "DGP/Graphics/Shader.hpp"
 #include <fstream>
 #include <sstream>
+#include <random>
 
 PointCloud::PointCloud(std::vector<Point> const & points_)
 : points(points_)
@@ -172,65 +173,68 @@ PointCloud::recomputeAABB()
 long
 PointCloud::ransac(long num_iters, Real slab_thickness, long min_points, Slab & slab, std::vector<Point *> & slab_points) const
 {
-  // TODO
 
   //   - Construct a kd-tree on the enabled points (remember to build the kd-tree with pointers to existing points -- you
   //     shouldn't be copying the points themselves, either explicitly or implicitly).
-      std::vector<Point *> pp;
-      for (size_t i = 0; i < points.size(); ++i)
-      {
-        if(points[i].isEnabled()) 
-        {
-          pp.push_back(const_cast<Point *>(&points[i]));  // removing the const is not the greatest thing to do, be careful...
-        }
-      }
-       
-      PointKDTree kdt(pp);
-
-      long max = 0;
   //   - Generate num_iters random triplets of enabled points and fit a plane to them.
-      for(long i =0; i<num_iters; i++){
-          //Generate 3 points && fit a plane through them
-          
-          long len = pp.size();
-
-          if(len == 0) return 0;
-
-          int rnd1 = std::rand()%len;
-          int rnd2 = std::rand()%len;
-          int rnd3 = std::rand()%len;
-
-          Plane3 plane;
-          plane = plane.fromThreePoints(pp[rnd1]->getPosition(), 
-                                        pp[rnd2]->getPosition(), 
-                                        pp[rnd3]->getPosition());
-
+  //   - Generate 3 points && fit a plane through them
   //   - Using the kd-tree, see how many other enabled points are contained in the slab supported by this plane with thickness
   //     slab_thickness (extends to distance 0.5 * slab_thickness on each side of the plane).
-
-          Slab tempslab(plane, slab_thickness);
-          std::vector<Point *> tempPoints;
-
-          kdt.rangeQuery(tempslab, tempPoints);
-          
-          long l = tempPoints.size();
-
   //   - If this number is >= min_points and > the previous maximum, the plane is the current best fit. Set the 'slab' argument
   //     to be the slab for this plane, and update slab_points to be the set of (enabled) matching points for this plane.
-
-          if (l > min_points && l > max)
-          {
-            max = l;
-            slab = tempslab;
-            slab.updateCorners(tempPoints);
-            slab_points = tempPoints;
-          }
-        }
-       
   //   - At the end, for visualization purposes, update the corners of the best slab using its set of matching points, and
   //     return the number of (enabled) matching points.
+      
 
-  return max;
+      
+  // Adding pointers of enabled points to the ransac data
+  std::vector<Point *> pp;
+  for (size_t i = 0; i < points.size(); ++i)
+  {
+    if(points[i].isEnabled()) 
+    {
+      pp.push_back(const_cast<Point *>(&points[i]));
+    }
+  }
+  
+  // Construct k-d Tree from these pointers to enabled points 
+  PointKDTree kdt(pp);
+
+  // Unbiased Random Number Generator to sample points
+  std::random_device rd;     
+  std::mt19937 rng(rd());
+  
+  
+  long maxPoints = 0;
+  for(int i =0; i<num_iters; i++){
+      
+      // Return if all points lie in plane slabs
+      if(pp.size() == 0) return 0;
+      std::uniform_int_distribution<int> uni(0,pp.size());
+
+      // Form plane from 3 random points
+      Plane3 plane = Plane3::fromThreePoints(pp[uni(rng)]->getPosition(), 
+                                             pp[uni(rng)]->getPosition(), 
+                                             pp[uni(rng)]->getPosition());
+
+      // Make a slab with the above plane and given thickness
+      Slab localSlab(plane, slab_thickness);
+      std::vector<Point *> localPoints;
+
+      // Perform RangeQuery via kd-tree and fill in the localPoints
+      kdt.rangeQuery(localSlab, localPoints);
+      
+      // Find number of points from query and update maxPoints if needed
+      long numPoints = localPoints.size();
+      if (numPoints > min_points && numPoints > maxPoints)
+      {
+        maxPoints = numPoints;
+        slab = localSlab;
+        slab.updateCorners(localPoints);
+        slab_points = localPoints;
+      }
+    }
+  return maxPoints;
 }
 
 long

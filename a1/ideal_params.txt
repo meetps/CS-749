@@ -1,0 +1,1 @@
+./pcloud --ransac 1000 50 0.005 3 data/cube.pts

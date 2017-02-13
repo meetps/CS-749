@@ -36,7 +36,7 @@ class PointKDTree : private Noncopyable
     /** Construct from a set of points. The points must last as long this kd-tree does. */
     void build(std::vector<Point> const & points);
 
-    Node *node(std::vector<Point *> const & points);
+    Node *buildTreeReturnRoot(std::vector<Point *> const & points);
 
   public:
     /** Construct from a set of points. The points must last as long this kd-tree does. */

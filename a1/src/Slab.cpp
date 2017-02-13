@@ -1,61 +1,61 @@
 #include "Slab.hpp"
 #include "DGP/Math.hpp"
 
-bool
-Slab::contains(Vector3 const & p) const{
-	// The equation of plane is a * x + b * y + c * z + d = 0
-	// the equation of other 2 planes at a distance l is
-	// a * x + b * y + c * z + d (+/-) k = 0
-	// k = sqrt(a^2 + b^2 + c^2)*l/2
-	// DONE
-	float a, b, c, d;
+bool Slab::contains(Vector3 const & p) const{
+  /*****
+  Logic - Obtain slab's central' plane equation 
+        - Get equation of the bounding planes ( upperPlane and lowerPlane )
+        - Check if the point p has opposite signs on both planes (return true if yes)
+        - Else return false 
+  *****/
+  
+  float a, b, c, d;
 	
   plane.getEquation(a, b, c, d);
 
-	float k = std::sqrt(a*a + b*c + c*c) * getThickness()/2;
+	float distance = std::sqrt(a*a + b*c + c*c) * getThickness()/2;
 	
-	Plane3 plane1, plane2;
-	plane1 = plane1.fromEquation(a,b,c,d+k);
-	plane2 = plane2.fromEquation(a,b,c,d-k);
+	Plane3 upperPlane = Plane3::fromEquation(a, b, c, d+distance);
+	Plane3 lowerPlane = Plane3::fromEquation(a, b, c, d-distance);
 	
-	if(plane1.positiveHalfSpaceContains(p) && plane2.negativeHalfSpaceContains(p) )
+	if(upperPlane.positiveHalfSpaceContains(p) && lowerPlane.negativeHalfSpaceContains(p) )
 		return true;
 
-	if(plane1.negativeHalfSpaceContains(p) && plane2.positiveHalfSpaceContains(p) )
+	if(upperPlane.negativeHalfSpaceContains(p) && lowerPlane.positiveHalfSpaceContains(p) )
 		return true;		
 
 	return false;
 }
 
-bool
-Slab::intersects(AxisAlignedBox3 const & box) const{
-  // DONE
+bool Slab::intersects(AxisAlignedBox3 const & box) const{
+  /*****
+  Logic - Obtain slab's central' plane equation 
+        - Get equation of the bounding planes ( upperPlane and lowerPlane )
+        - Check iteratively if all 8 points of the boundingBox have opposite signs on both planes
+        - Return true if all 8 checks are true.
+  *****/  
+
   float a, b, c, d;
 	plane.getEquation(a, b, c, d);
 
-	float k = std::sqrt(a*a + b*c + c*c) * getThickness()/2;
-  // std::cout<<a<<b<<c<<d<<k<<"\n";
-	Plane3 plane1, plane2;
-	plane1 = plane1.fromEquation(a,b,c,d+k);
-	plane2 = plane2.fromEquation(a,b,c,d-k);
-	//This variables would be true if all the points 
-	// of the box are on the same side of slab
-	// bool check1=true, check2=true;
-  std::vector<bool> left(8,0);
-  std::vector<bool> right(8,0);
-	for(long i=0; i<8;i++){
+	float distance = std::sqrt(a*a + b*c + c*c) * getThickness()/2;
+  
+	Plane3 upperPlane = Plane3::fromEquation(a, b, c, d+distance);
+	Plane3 lowerPlane = Plane3::fromEquation(a, b, c, d-distance);
+	
+  int pointsLeft=0, pointsRight=0;
+
+  for(int i=0; i<8; i++)
+  {
 		Vector3 p = box.getCorner(i);
-    if( (!plane1.positiveHalfSpaceContains(p)) && (!plane2.positiveHalfSpaceContains(p)) )
-      left[i] = 1;
-    if( (!plane1.negativeHalfSpaceContains(p)) && (!plane2.negativeHalfSpaceContains(p)) )
-      right[i] = 1;  
+
+    if( (!upperPlane.positiveHalfSpaceContains(p)) && (!lowerPlane.positiveHalfSpaceContains(p)) )
+      pointsLeft += 1;
+    if( (!upperPlane.negativeHalfSpaceContains(p)) && (!lowerPlane.negativeHalfSpaceContains(p)) )
+      pointsRight += 1;
   }
 
-  int lsum = std::accumulate(std::begin(left),std::end(left),0);
-  int rsum = std::accumulate(std::begin(right),std::end(right),0);
-
-  return !((lsum==8) || (rsum==8));
-
+  return !( (pointsLeft==8) || (pointsRight==8) );
 }
 
 void

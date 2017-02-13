@@ -34,23 +34,28 @@ PointKDTree::build(std::vector<Point> const & points)
 }
 
 
-PointKDTree::Node *PointKDTree::node(std::vector<Point *> const & points)
+PointKDTree::Node *PointKDTree::buildTreeReturnRoot(std::vector<Point *> const & points)
 {
-  PointKDTree* temp = new PointKDTree(points);
-  return temp->root;
+  PointKDTree* tempTree = new PointKDTree(points);
+  return tempTree->root;
 }
 
 
-void fillLoAndHi(std::vector<Point*> &loPoints, 
-	std::vector<Point*> &hiPoints, std::vector<Point*> const &points, 
-	float midValue, int index){
-
-	for(int i=0; i<points.size(); i++){
-		if((points[i]->getPosition())[index] < midValue){
-			loPoints.push_back(points[i]);
+void splitPoints(std::vector<Point*> &lowPoints, 
+	               std::vector<Point*> &highPoints, 
+                 std::vector<Point*> const &points, 
+	               float midValue, 
+                 int index)
+{
+	for(int i=0; i<points.size(); i++)
+  {
+		if((points[i]->getPosition())[index] < midValue)
+    {
+			lowPoints.push_back(points[i]);
 		}
-		else{
-			hiPoints.push_back(points[i]);
+		else
+    {
+			highPoints.push_back(points[i]);
 		}
 	}
 }
@@ -68,17 +73,19 @@ PointKDTree::build(std::vector<Point *> const & points)
   //   for each split. Stop when number of points in node <= MAX_POINTS_PER_LEAF.
   // - Don't forget to save space by clearing the arrays of points in internal nodes. Only the leaves need to store references
   //   to points.
-	
-  // this->
-  Node * ptr_root = new Node();
-  ptr_root->points = points;
-  root = ptr_root; 
 
+  // Make new node and assign all points
+  Node * rootPointer = new Node();
+  rootPointer->points = points;
+  root = rootPointer; 
+
+  // Add points to the bbox of the node
   for(int i=0; i<points.size(); i++)
   {
 		root->bbox.addPoint((*points[i]).getPosition());
 	}
 
+  // If points in node are within limits, do not split
 	if(points.size()<=MAX_POINTS_PER_LEAF)
   {
 		root->lo = root->hi = NULL;
@@ -87,33 +94,33 @@ PointKDTree::build(std::vector<Point *> const & points)
 			(root->points).push_back(points[i]);
 		}
 	}
+  // Else begin point splitting
 	else 
   {
-		std::vector<Point*> loPoints;
-		std::vector<Point*> hiPoints;
+		std::vector<Point*> lowPoints;
+		std::vector<Point*> highPoints;
 		
-    // std::vector<Point*> loPoints = new std::vector<Point*>;
-		// std::vector<Point*> hiPoints= new std::vector<Point*>;
-
-    VectorN<3,float> high = root->bbox.getHigh();
-		VectorN<3,float> low = root->bbox.getLow();
+    VectorN<3,float> highValues = root->bbox.getHigh();
+		VectorN<3,float> lowValues = root->bbox.getLow();
 		
-    float maxLength = std::max(high[0]-low[0], std::max(high[1] - low[1], high[2] - low[2]));
+    float maxLength = std::max(highValues[0]-lowValues[0], 
+                               std::max(highValues[1] - lowValues[1], 
+                                        highValues[2] - lowValues[2]));
 		
-    if(maxLength == high[0] - low[0])
+    if(maxLength == highValues[0] - lowValues[0])
     {
-			fillLoAndHi(loPoints, hiPoints, points, (high[0] + low[0])/2.0, 0);
+			splitPoints(lowPoints, highPoints, points, (highValues[0] + lowValues[0])/2.0, 0);
 		}
-		else if(maxLength == high[1] - low[1])
+		else if(maxLength == highValues[1] - lowValues[1])
     {
-			fillLoAndHi(loPoints, hiPoints, points, (high[1] + low[1])/2.0, 1);
+			splitPoints(lowPoints, highPoints, points, (highValues[1] + lowValues[1])/2.0, 1);
 		}
 		else 
     {
-			fillLoAndHi(loPoints, hiPoints, points, (high[2] + low[2])/2.0, 2);
+			splitPoints(lowPoints, highPoints, points, (highValues[2] + lowValues[2])/2.0, 2);
 		}
 		
-    root->lo = node(loPoints);
-		root->hi = node(hiPoints);
+    root->lo = buildTreeReturnRoot(lowPoints);
+		root->hi = buildTreeReturnRoot(highPoints);
 	}
 }
