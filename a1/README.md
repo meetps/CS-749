@@ -5,12 +5,10 @@ to explain my logic behind the code. I'm repeating them here function wise.
 
 ### Slab::contains
 
-/*****
-  Logic - Obtain slab's central' plane equation 
-        - Get equation of the bounding planes ( upperPlane and lowerPlane )
-        - Check if the point p has opposite signs on both planes (return true if yes)
-        - Else return false 
-*****/
+Logic - Obtain slab's central' plane equation 
+      - Get equation of the bounding planes ( upperPlane and lowerPlane )
+      - Check if the point p has opposite signs on both planes (return true if yes)
+      - Else return false 
 
 ### Slab::intersects
 
