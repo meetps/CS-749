@@ -69,7 +69,6 @@ class PointKDTree : private Noncopyable
     template <typename RangeT>
     void rangeQuery(RangeT const & range, std::vector<Point *> & points_in_range) const
     {
-      // TODO
 
       points_in_range.clear();
       rangeQueryHelper(root, range, points_in_range);

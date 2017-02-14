@@ -47,7 +47,7 @@ void splitPoints(std::vector<Point*> &lowPoints,
 	               float midValue, 
                  int index)
 {
-	for(int i=0; i<points.size(); i++)
+	for(unsigned int i=0; i<points.size(); i++)
   {
 		if((points[i]->getPosition())[index] < midValue)
     {
@@ -75,12 +75,13 @@ PointKDTree::build(std::vector<Point *> const & points)
   //   to points.
 
   // Make new node and assign all points
+ 
   Node * rootPointer = new Node();
   rootPointer->points = points;
   root = rootPointer; 
 
   // Add points to the bbox of the node
-  for(int i=0; i<points.size(); i++)
+  for(unsigned int i=0; i<points.size(); i++)
   {
 		root->bbox.addPoint((*points[i]).getPosition());
 	}
@@ -89,7 +90,7 @@ PointKDTree::build(std::vector<Point *> const & points)
 	if(points.size()<=MAX_POINTS_PER_LEAF)
   {
 		root->lo = root->hi = NULL;
-		for (int i=0; i<points.size(); i++)
+		for (unsigned int i=0; i<points.size(); i++)
     {
 			(root->points).push_back(points[i]);
 		}

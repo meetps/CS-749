@@ -210,7 +210,7 @@ PointCloud::ransac(long num_iters, Real slab_thickness, long min_points, Slab & 
       
       // Return if all points lie in plane slabs
       if(pp.size() == 0) return 0;
-      std::uniform_int_distribution<int> uni(0,pp.size());
+      std::uniform_int_distribution<int> uni(0,pp.size()-1);
 
       // Form plane from 3 random points
       Plane3 plane = Plane3::fromThreePoints(pp[uni(rng)]->getPosition(), 
