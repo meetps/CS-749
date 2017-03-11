@@ -5,8 +5,6 @@
 void
 MeshVertex::updateQuadric()
 {
-  // TODO
-
   // This function has some skeleton code to help you along...
 
   quadric = DMat4::zero();
@@ -25,7 +23,7 @@ MeshVertex::updateQuadric()
     // What is the term for this face?
     // How do you include it in the quadric?
     // Do this here.
-    additive_error = DMat4(a*a, a*b, a*c, a*d,
+    DMat4 additive_error = DMat4(a*a, a*b, a*c, a*d,
                            b*a, b*b, b*c, b*d,
                            c*a, c*b, c*c, c*d,
                            d*a, d*b, d*c, d*d); 
