@@ -50,10 +50,10 @@ MeshEdge::updateQuadricCollapseError()
   // Update the collapse position if invertible
   if(is_invertible)
   {
-    auto productVector = q_new.inverse() * unit_vector_4;
+    auto product_vector = q_new.inverse() * unit_vector_4;
     for(int i=0; i<3; i++)
     {
-      quadric_collapse_position[i] = productVector[i];
+      quadric_collapse_position[i] = product_vector[i];
     }  
   }
   // Else just take the average

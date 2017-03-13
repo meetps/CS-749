@@ -268,6 +268,8 @@ Mesh::decimateQuadricEdgeCollapse()
   double min_error = MAX;
   for(auto it = edgesBegin(); it!= edgesEnd(); it++)
   {
+    // Note Since Edge is a pointer to an Edge, its necessary to deference 
+    // it by `&(<pointer_variable>)` as below or get segmentation fault 
     Edge* temp_edge = &(*it);
     double error = temp_edge->getQuadricCollapseError();
     if(error>0 && error<min_error)

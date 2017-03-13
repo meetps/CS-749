@@ -18,7 +18,7 @@ to explain my logic behind the code. I'm repeating them here function wise.
 - Update the `collapse_error` accordingly 
 
 ### Mesh::decimateQuadricEdgeCollapse()
-- I just followed the steps given in the TODO
+- I just followed the steps given in the `TODO`, nothing less or more.	
 - Loop over edges to find the one with the minimum error (remember to check if the error is negative, in which case the edge is invalid for collapsing).
 - Collapse the min error edge, if a valid one is found (else return NULL). There is a convenient function for this (it is a good exercise to study how this function operates). Make a note of the single vertex which is the result of the collapse.
 - Update the normal of every face incident on this vertex.
@@ -38,4 +38,10 @@ to explain my logic behind the code. I'm repeating them here function wise.
 
 ## Additional Notes
 
-- None
+- I've tested the algorithm implementation by running it iteration by iteration on torus and cude and it works fine. I'd wanted to add the simplified bunny `.off` files as comparison with the ones provided, however the size constraints prevents me from doing so. 
+
+## Completion
+
+- (a) Did not do EC1
+- (b) Did not do EC2
+- (c) Did everything required
