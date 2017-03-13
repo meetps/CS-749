@@ -56,7 +56,7 @@ MeshEdge::updateQuadricCollapseError()
       quadric_collapse_position[i] = productVector[i];
     }  
   }
-  // Just take the average
+  // Else just take the average
   else
   {
     quadric_collapse_position = (a->getPosition() + b->getPosition())/2.0;

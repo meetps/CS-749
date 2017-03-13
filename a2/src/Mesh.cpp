@@ -8,6 +8,8 @@
 #include <fstream>
 #include <unordered_map>
 
+#define MAX 1e20
+
 MeshEdge *
 Mesh::mergeEdges(Edge * e0, Edge * e1)
 {
@@ -259,23 +261,58 @@ Mesh::decimateQuadricEdgeCollapse()
 {
   DGP_CONSOLE << getName() << ": Mesh has " << numFaces() << " faces, collapsing a single edge";
 
-  // TODO
-
   // The general scheme here is:
   // (1) Loop over edges to find the one with the minimum error (remember to check if the error is negative, in which case the
   //     edge is invalid for collapsing).
+  Edge* min_edge = NULL;
+  double min_error = MAX;
+  for(auto it = edgesBegin(); it!= edgesEnd(); it++)
+  {
+    Edge* temp_edge = &(*it);
+    double error = temp_edge->getQuadricCollapseError();
+    if(error>0 && error<min_error)
+    {
+      min_error = error;
+      min_edge = temp_edge;
+    }
+  }
+
   // (2) Collapse the min error edge, if a valid one is found (else return NULL). There is a convenient function for this (it is
   //     a good exercise to study how this function operates). Make a note of the single vertex which is the result of the
   //     collapse.
+    if(min_edge==NULL)
+    return NULL;
+
+  Vertex* min_vertex = min_edge->getEndpoint(0);
+  Vector3 min_pos = min_edge->getQuadricCollapsePosition();
+  collapseEdge(min_edge);
+  min_vertex->setPosition(min_pos);
+
+
   // (3) Update the normal of every face incident on this vertex.
+  for(auto it = min_vertex->facesBegin(); it != min_vertex->facesEnd(); it++)
+  {
+    (*it)->updateNormal();
+  }
+
   // (4) Update the quadric for this vertex, as well as the normal of the vertex (there are convenient functions for this, one
   //     of which you will write yourself).
+  min_vertex->updateQuadric();
+  min_vertex->updateNormal();
+
   // (5) For every edge incident on this vertex:
   //     - Update the quadric and normal for its other endpoint, which has also been affected.
   //     - Update the quadric collapse error and the optimal collapse position for the edge.
-  // (6) Return the vertex.
+  for(auto it = min_vertex->edgesBegin(); it!=min_vertex->edgesEnd(); it++)
+  {
+    Vertex* adjacent_vertex = (*it)->getOtherEndpoint(min_vertex);
+    adjacent_vertex->updateQuadric();
+    adjacent_vertex->updateNormal();
+    (*it)->updateQuadricCollapseError();
+  }
 
-  return NULL;
+  // (6) Return the vertex.
+  return min_vertex;
 }
 
 void
