@@ -13,6 +13,8 @@ usage(int argc, char * argv[])
   return -1;
 }
 
+
+// Computing the signed volume of a face formed by three vectors.
 double 
 signedVolumeOfTriangle(Vector3 p1, Vector3 p2, Vector3 p3) 
 {
@@ -31,6 +33,7 @@ double
 computeVolume(Mesh const & mesh)
 {
   
+  // Vector to store signed volumes of each triangle from the mesh
   std::vector<double> signedVolumes;
   for(Mesh::FaceConstIterator it = mesh.facesBegin(); it != mesh.facesEnd(); it++)
   {
@@ -49,6 +52,8 @@ computeVolume(Mesh const & mesh)
         signedVolumes.push_back(signedVolumeOfTriangle(tv[0], tv[1], tv[2]));
     }
 
+    // I planned to do this, but for all the 907 meshes I never encountered a mesh which had 
+    // a quad face. Good guy PSB, Meshes were already triangulated.
     if(f.numVertices() > 3)
     {
         DGP_CONSOLE << f.numVertices();
@@ -56,6 +61,7 @@ computeVolume(Mesh const & mesh)
 
   }
 
+  // Sum the signed volume of triangles and take the absolute.
   double volume = 0.0;
   for(std::vector<double>::iterator it = signedVolumes.begin(); it != signedVolumes.end(); ++it)
     volume += *it;
@@ -77,11 +83,12 @@ computeVolumeToBBoxRatio(Mesh const & mesh)
   double bboxVolume = mesh.getAABB().volume();
   DGP_CONSOLE << bboxVolume;
 
-  // if(objVolume > bboxVolume)
-  // {
-  //   DGP_CONSOLE << "Object Volume " << objVolume << " Greater than bbox << | Something wrong with mesh";
-  //   return -1;
-  // }
+  // Some Sanity Checks
+  if(objVolume > bboxVolume)
+  {
+    DGP_CONSOLE << "Object Volume " << objVolume << " Greater than bbox << | Something wrong with mesh";
+    return -1;
+  }
 
   return objVolume / bboxVolume;
 }
